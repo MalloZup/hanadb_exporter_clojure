@@ -36,7 +36,7 @@
 
 (defn query-exec [query]
   "ex query and return namespaced map"
-  (jdbc/execute-one! ds [query]))
+  (jdbc/execute! ds [query]))
 
 
 ;; this metrics are not real ones..
