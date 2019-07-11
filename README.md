@@ -8,7 +8,11 @@ This project is experimental.
 
 However it will follow the same API defined by https://github.com/SUSE/hanadb_exporter.
 
-Especially the `metrics.json` file for hanadb queries and config.json for configuration.
+The API is defined by 2 json files:
+
+- `config.json` which configure the exporter setup  and the db
+
+- `metrics.json` which configure the metrics and query the prometheus exporter will perform.
 
 ## New jar 
 
