@@ -20,22 +20,23 @@
 ;; take the hana part of configuration
   (let [{:keys [host port user password]} (get-in (exporter/config) [:hana] )]
       ;; override default value with config.json
-      (merge hanadb-default {:host host :port port :user user :password password})
-   ;; (jdbc/get-datasource db)
-  ))
+      (merge hanadb-default {:host host :port port :user user :password password})))
 
 (def ds (jdbc/get-datasource hanadb-conf))
 
 
 (defn query-hanadb-version []
-"returns a namespaced maps"
-(jdbc/execute-one! ds ["select * from sys.m_database"]))
+  "returns a namespaced map"
+  (jdbc/execute-one! ds ["select * from sys.m_database"]))
 
 (defn hanadb-version []
   "return vresion as string"
   (:M_DATABASE_/VERSION (query-hanadb-version))
 )
 
+(defn query-exec [query]
+  "ex query and return namespaced map"
+  (jdbc/execute-one! ds [query]))
 
 
 ;; this metrics are not real ones..
