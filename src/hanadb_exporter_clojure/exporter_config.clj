@@ -11,4 +11,4 @@
 (defn read-config []
   (parse-stream (clojure.java.io/reader config-file) true))
 
-(def config read-config)
+(def config   (read-config))
