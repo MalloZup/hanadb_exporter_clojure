@@ -42,26 +42,33 @@
 
 (def metrics (read-metrics))
 
-;; API SPECIFICATION 
-
-;; 01) query:
-;; (first (first metrics))
-
-;; 02) meta-information for the query (enable, range) (Meta for the query) 
-;; (second (first metrics)) 
-;
-
-;; 03 metrics: prometheus exporter defintions ( LIST)
-
-;; e> (get-in (second (first metrics)) [:metrics])
-
-
 ;; create specific metric with labels
 (defn register-gauge [{:keys [name description labels]}]
   (prometheus/gauge
     (keyword (str "hanadb/" name))
     {:description description
      :labels labels}))
+
+(defn enabled-metrics [all-metrics]
+  (remove #(false? (:enabled (second %))) all-metrics)
+)
+(defn check-if-in-hana-range [metrics]
+  "check if the metric is inside to hanadb version range"
+  (println "not yet"))
+
+(defn register-all [metrics]
+
+  ;; remove all disable metrics.
+  ;; second entry is metadata
+  ;; TODO: handle range of version hanadb (skip if not allowed)
+    (doseq [entry (enabled-metrics metrics)]
+    ;; sql-query, execute it (todo)
+    (first entry) 
+    ;; meta-data about the query  ;; (second entry) 
+   
+    ;; check this out
+    (register-gauge  (first (get-in (second entry) [:metrics])))
+    ))
 
 ;; register various metrics to registry
 (defonce registry

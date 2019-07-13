@@ -15,7 +15,8 @@
     ]
   },
   "SELECT host, schema_name, ROUND(SUM(memory_size_in_total)/1024/1024) schema_memory_used_mb FROM sys.m_cs_tables GROUP BY host, schema_name;":
-  {
+  { 
+    "enabled": false,
     "hana_version_range": ["1.0.0"],
     "metrics": [
       {
