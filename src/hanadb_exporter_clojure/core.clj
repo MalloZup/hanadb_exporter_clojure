@@ -15,7 +15,6 @@
    :host "10.162.32.88" :port "30013" 
    :user "SYSTEM" :password "Linux01Linux"})
 
-
 (def hanadb-conf
 ;; destructure config.json and take the hana part of configuration
   (let [{:keys [host port user password]} (get-in exporter/config [:hana] )]
@@ -45,41 +44,55 @@
 ;; create specific metric with labels
 (defn register-gauge [registry {:keys [name description labels]}]
   (prometheus/register registry  (prometheus/gauge
-    (keyword (str name))
+    (keyword (str "sap/" name))
     {:description description
      :labels labels})))
 
-(defn enabled-metrics [all-metrics]
+(defn get-enabled-metrics [all-metrics]
   (remove #(false? (:enabled (second %))) all-metrics))
 
 (defn check-if-in-hana-range [metrics]
   "check if the metric is inside to hanadb version range"
   (println "not yet"))
 
-(defn register-all [metrics]
- "main function for register all type of metrics"
-  ;; remove all disable metrics.
-  ;; second entry is metadata
-  ;; TODO: handle range of version hanadb (skip if not allowed)
-    (doseq [entry (enabled-metrics metrics)]
-    ;; sql-query, execute it (todo)
-    (first entry) 
-    ;; meta-data about the query  ;; (second entry) 
-   
-    ;; TODO filter metrics which are only gauge type
-    (register-gauge hanadb-registry (first (get-in (second entry) [:metrics])))
-    ))
 
 ;; register various metrics to registry
 (defonce hanadb-registry
   (prometheus/collector-registry "hanadb")) ()
 
+(defn register-all [metrics]
+ "main function for register all type of metrics"
+  ;; remove all disable metrics.
+  ;; second entry is metadata
+  ;; TODO: handle range of version hanadb (skip if not allowed)
+    (doseq [entry (get-enabled-metrics metrics)]
+      
+    ;; TODO filter metrics which are only gauge type
+    ;; IMPORTANT/HACK/TODO we should iterate over the :metrics vector, instead of just taking the first
+    (register-gauge hanadb-registry (first (get-in (second entry) [:metrics])))
+    ))
+
+;; FIx this; we need to query the value vector from a query 
+(defn save-values-to-gauges [metrics]
+  "execute sql query and store the value to gauge"
+  ;; TODO filter metrics that are gauge type only
+  (doseq [entry (get-enabled-metrics metrics)]
+    ;; this is for removing the ":" to select. the string is impure.
+    (let [query-result (query-exec (second (clojure.string/split (str (first entry)) #":")))
+          ;; user value is also a vector, because for each query we have multiples
+          user-value "fixme"] 
+      (map #(println ((keyword user-value))) query-result)
+    )
+   ;; TODO: select only the "value"
+))
+
 ;; Serve metrics
 (defonce httpd
-  (standalone/metrics-server registry {:port 8082}))
+  (standalone/metrics-server hanadb-registry {:port 8082}))
 
 ;; dump metrics via print
 (defn dump-metrics [] 
   (print (export/text-format hanadb-registry)))
 
-
+;; TEST data: this is a query example. remove later
+ (def res (query-exec "SELECT host, ROUND(SUM(memory_size_in_total)/1024/1024) column_tables_used_mb FROM sys.m_cs_tables GROUP BY host;"))
