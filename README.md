@@ -2,9 +2,15 @@
 
 Clojure hanadb exporter for Prometheus
 
-## Usage
+# Rationale:
 
-This project is experimental.
+This project use clojure and jdbc.next and prometheus expoert for SAP-hana db.
+
+# Status:
+
+the status is experimental and on wip
+
+## Usage
 
 However it will follow the same API defined by https://github.com/SUSE/hanadb_exporter.
 

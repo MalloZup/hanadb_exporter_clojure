@@ -72,19 +72,18 @@
     (register-gauge hanadb-registry (first (get-in (second entry) [:metrics])))
     ))
 
-;; FIx this; we need to query the value vector from a query 
+
 (defn save-values-to-gauges [metrics]
   "execute sql query and store the value to gauge"
   ;; TODO filter metrics that are gauge type only
   (doseq [entry (get-enabled-metrics metrics)]
-    ;; this is for removing the ":" to select. the string is impure.
+    ;; this is for removing the ":" from :select. the string is impure.
     (let [query-result (query-exec (second (clojure.string/split (str (first entry)) #":")))
           ;; user value is also a vector, because for each query we have multiples
-          user-value "fixme"] 
-      (map #(println ((keyword user-value))) query-result)
-    )
-   ;; TODO: select only the "value"
-))
+          prometheus-info ((first (get-in (second entry) [:metrics])))]
+      ;; iterate over prometheus info 
+      (map #(println ((keyword "value-fixme"))) query-result)
+    )))
 
 ;; Serve metrics
 (defonce httpd
