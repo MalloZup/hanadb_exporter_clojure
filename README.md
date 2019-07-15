@@ -1,6 +1,6 @@
 # hanadb_exporter_clojure
 
-Clojure hanadb exporter for Prometheus
+Clojure hanadb exporter Prometheus for hanadb SAP db
 
 # Rationale:
 
